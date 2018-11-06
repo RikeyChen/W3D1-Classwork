@@ -101,14 +101,21 @@ def andrews_films_and_leads
   # Andrews' played in.
   execute(<<-SQL)
     SELECT title, name
-    FROM
-      (SELECT *
-      FROM actors
-      WHERE name = 'Julie Andrews') AS beans
+    FROM actors
     JOIN castings
-      ON beans.id = castings.movie_id
-    JOIN actors
-      ON castings.actor_id = actors.id
+      ON actors.id = castings.movie_id
+    JOIN movies
+      ON castings.movie_id = movies.id
+    WHERE movies.id IN
+        (SELECT movies.id
+        FROM actors
+        JOIN castings
+          ON actors.id = castings.movie_id
+        JOIN movies
+          ON castings.movie_id = movies.id
+        WHERE name = 'Julie Andrews')
+      AND ord = 1;
+
     WHERE  ______
   SQL
 end
